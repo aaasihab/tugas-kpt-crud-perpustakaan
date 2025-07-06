@@ -10,38 +10,26 @@ use Faker\Factory as Faker;
 class BukuSeeder extends Seeder
 {
     /**
-     * Menjalankan seeder untuk mengisi data buku.
-     *
-     * @return void
+     * Run the database seeds.
      */
-    public function run()
+    public function run(): void
     {
-        // Ambil semua kategori yang ada di tabel kategori
-        $kategori = Kategori::all();
+        $faker = Faker::create();
+        $kategoriList = Kategori::all();
 
-        // Pastikan ada kategori di database sebelum memasukkan data buku
-        if ($kategori->isEmpty()) {
-            $this->command->info('Tidak ada kategori yang ditemukan, pastikan data kategori sudah ada.');
-            return;
+        foreach ($kategoriList as $kategori) {
+            for ($i = 1; $i <= 3; $i++) {
+                Buku::create([
+                    'kategori_id' => $kategori->id_kategori,
+                    'judul' => $faker->sentence(3),
+                    'deskripsi' => $faker->paragraph,
+                    'penulis' => $faker->name,
+                    'penerbit' => $faker->company,
+                    // Gambar dummy langsung dari URL (otomatis dan berbeda-beda)
+                    'cover' => 'https://picsum.photos/200/300?random=' . rand(1, 9999),
+                    'status' => 'tersedia',
+                ]);
+            }
         }
-
-        // Inisialisasi Faker untuk menghasilkan data palsu
-        $faker = Faker::create('id_ID'); // Menggunakan lokal Indonesia
-
-        // Menambahkan 20 data buku
-        for ($i = 1; $i <= 20; $i++) {
-            Buku::create([
-                'kategori_id' => $kategori->random()->id_kategori, // Mengambil kategori secara acak
-                'judul' => $faker->sentence(3), // Membuat judul buku secara acak
-                'deskripsi' => $faker->paragraph(), // Membuat deskripsi buku secara acak
-                // 'deskripsi' => Str::limit($faker->paragraphs(3, true), 65535),
-                'penulis' => $faker->name, // Nama penulis secara acak
-                'penerbit' => $faker->name, // Nama penulis secara acak
-                'cover' => 'https://via.placeholder.com/150', // URL gambar placeholder sebagai cover
-                'status' => $faker->randomElement(['aktif', 'nonaktif']), // Status acak antara 'aktif' dan 'nonaktif'
-            ]);
-        }
-
-        $this->command->info('20 data buku telah berhasil ditambahkan.');
     }
 }
